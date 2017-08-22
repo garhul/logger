@@ -28,42 +28,52 @@ module.exports = (config) => {
 
   var cfg = Object.assign(defaults, config);
 
-  function log(level, text, tag) {
+  function log(level, text, tag, terminal = false) {
     let output = '';
     if (cfg.timestamp)
       output = cfg.logString.replace('[TSTAMP]', chalk.gray(new Date().toISOString()));
 
-    output = output.replace('[LEVEL]', () => {
-      switch(level) {
-        case ERROR:
-          return chalk.bgRed.bold(LEVEL_TEXTS[level]);
-        break;
+    if (cfg.of !=== null)  {
+      output = output.replace('[LEVEL]', () => {
+        switch(level) {
+          case ERROR:
+            return chalk.bgRed.bold(LEVEL_TEXTS[level]);
+          break;
 
-        case WARN:
-          return chalk.magenta.bold(LEVEL_TEXTS[level]);
-        break;
+          case WARN:
+            return chalk.magenta.bold(LEVEL_TEXTS[level]);
+          break;
 
-        case INFO:
-          return chalk.blue(LEVEL_TEXTS[level]);
-        break;
+          case INFO:
+            return chalk.blue(LEVEL_TEXTS[level]);
+          break;
 
-        case NOTICE:
-          return chalk.cyan(LEVEL_TEXTS[level]);
-        break;
+          case NOTICE:
+            return chalk.cyan(LEVEL_TEXTS[level]);
+          break;
 
-        default:
-          return chalk.yellow(LEVEL_TEXTS[level]);
-      }
-    });
+          default:
+            return chalk.yellow(LEVEL_TEXTS[level]);
+        }
+      });
 
-    output = output.replace('[TAG]', chalk.gray(`[ ${tag} ]`));
-    output = output.replace('[TEXT]', chalk.white(`  ${text}`));
+      output = output.replace('[TAG]', chalk.gray(`[ ${tag} ]`));
+      output = output.replace('[TEXT]', chalk.white(`  ${text}`));
+    } else {
+      output = output.replace('[LEVEL]',LEVEL_TEXTS[level]);
+      output = output.replace('[TAG]', `[${tag}]`);
+      output = output.replace('[TEXT]', `  ${text}`);
+    }
 
-    if (cfg.of === null) {
+    if (cfg.of === null || terminal === true) {
       console.log(output);
     } else {
       fs.writeFile(cfg.of , output + "\n", {encoding:'utf8', flag:"a"}, (err) => { if (err) throw err });
     }
+  }
+
+  function terminal(text, tag = 'GENERAL') {
+    log(INFO, text, tag, true);
   }
 
   function error(text, tag = 'GENERAL') {
@@ -104,5 +114,6 @@ module.exports = (config) => {
     w:warn,
     e:error,
     n:notice,
+    t:terminal,
   }
 }
