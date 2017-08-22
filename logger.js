@@ -33,7 +33,7 @@ module.exports = (config) => {
     if (cfg.timestamp)
       output = cfg.logString.replace('[TSTAMP]', chalk.gray(new Date().toISOString()));
 
-    if (cfg.of !=== null || terminal === true)  {
+    if (cfg.of !== null || terminal === true)  {
       output = output.replace('[LEVEL]', () => {
         switch(level) {
           case ERROR:
